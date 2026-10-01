@@ -1,15 +1,25 @@
-import UploadBox from './components/UploadBox'
+import Quiz from "./components/Quiz";
+import UploadBox from "./components/UploadBox";
+import "./App.css";
 
 function App() {
   return (
-    <div>
-      <h1>Study Masters</h1>
+    <main className="app">
+      <section className="hero">
+        <div className="icon">📚</div>
 
-      <p>Turn your study material into personalized practice.</p>
+        <h1>Study Masters</h1>
 
-      <UploadBox />
-    </div>
-  )
+        <p className="tagline">
+          Turn your study material into personalized practice.
+        </p>
+
+        <UploadBox />
+
+        <Quiz />
+      </section>
+    </main>
+  );
 }
 
-export default App
+export default App;
