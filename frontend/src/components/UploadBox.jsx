@@ -78,17 +78,15 @@ function UploadBox({ onQuizGenerated }) {
 
   return (
     <div className="upload-box">
-      <div className="upload-header">
-        <div className="upload-icon">📄</div>
+      <h2>Upload your study material</h2>
 
-        <h2>Upload your study material</h2>
+      <p>
+        Upload a PDF and let Study Masters create a personalized quiz.
+      </p>
 
-        <p>
-          Upload a PDF and let Study Masters create a personalized quiz.
-        </p>
-      </div>
+      {/* PDF UPLOAD AREA */}
 
-      <label className="file-upload">
+      <label className="file-upload-area">
         <input
           type="file"
           accept="application/pdf,.pdf"
@@ -96,24 +94,34 @@ function UploadBox({ onQuizGenerated }) {
           disabled={loading}
         />
 
-        <span className="file-upload-icon">↑</span>
+        <div className="upload-icon">
+          ↑
+        </div>
 
-        <span className="file-upload-title">
-          {file ? "PDF selected" : "Choose a PDF"}
-        </span>
+        <div className="upload-title">
+          {file ? "PDF selected" : "Drop your PDF here"}
+        </div>
 
-        <span className="file-upload-subtitle">
+        <div className="upload-subtitle">
           {file
-            ? "Click to choose a different file"
-            : "Click here or drag and drop your file"}
-        </span>
+            ? "Click here to choose a different file"
+            : "or click to browse your files"}
+        </div>
+
+        <div className="upload-hint">
+          PDF files · Maximum 10 MB
+        </div>
       </label>
+
+      {/* SELECTED FILE */}
 
       {file && (
         <div className="selected-file">
-          <span className="selected-file-icon">📄</span>
+          <div className="file-icon">
+            📄
+          </div>
 
-          <div className="selected-file-info">
+          <div className="file-info">
             <strong>{file.name}</strong>
 
             <span>
@@ -121,11 +129,16 @@ function UploadBox({ onQuizGenerated }) {
             </span>
           </div>
 
-          <span className="file-check">✓</span>
+          <div className="file-check">
+            ✓
+          </div>
         </div>
       )}
 
+      {/* QUIZ SETTINGS */}
+
       <div className="quiz-settings">
+
         <div className="setting">
           <label htmlFor="question-count">
             Number of questions
@@ -163,50 +176,45 @@ function UploadBox({ onQuizGenerated }) {
             <option value="Hard">Hard</option>
           </select>
         </div>
+
       </div>
 
+      {/* ERROR */}
+
       {error && (
-        <div className="status-message error-message">
-          <span>⚠️</span>
-          <p>{error}</p>
-        </div>
+        <p className="upload-error">
+          {error}
+        </p>
       )}
+
+      {/* LOADING */}
 
       {loading && (
-        <div className="status-message loading-message">
-          <span className="loading-spinner"></span>
-
-          <p>
-            Processing PDF and generating your{" "}
-            {difficulty.toLowerCase()} quiz...
-          </p>
-        </div>
+        <p className="upload-loading">
+          Processing PDF and generating your{" "}
+          {difficulty.toLowerCase()} quiz...
+        </p>
       )}
 
-      {result && !loading && (
-        <div className="status-message success-message">
-          <span>✓</span>
-          <p>{result}</p>
-        </div>
+      {/* SUCCESS */}
+
+      {result && (
+        <p className="upload-success">
+          {result}
+        </p>
       )}
+
+      {/* GENERATE BUTTON */}
 
       <button
-        className="generate-button"
         onClick={handleGenerateQuiz}
         disabled={!file || loading}
       >
-        {loading ? (
-          <>
-            <span className="button-spinner"></span>
-            Generating Quiz...
-          </>
-        ) : (
-          <>
-            Generate Quiz
-            <span>→</span>
-          </>
-        )}
+        {loading
+          ? "Generating Quiz..."
+          : "Generate Quiz →"}
       </button>
+
     </div>
   );
 }

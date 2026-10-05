@@ -50,27 +50,32 @@ function Quiz({ questions }) {
 
     return (
       <div className="quiz-box score-screen">
-        <div className="score-icon">📚</div>
 
-        <h2>Quiz Complete!</h2>
+        <div className="score-icon">
+          ✦
+        </div>
+
+        <div className="section-label">
+          QUIZ COMPLETE
+        </div>
+
+        <h2>Great work.</h2>
 
         <p className="score-message">
           {percentage >= 80
-            ? "Excellent work! 🎉"
+            ? "Excellent work! You've got this."
             : percentage >= 60
-            ? "Good job! Keep practicing. 💪"
-            : "Keep studying and give it another shot. 💪"}
+            ? "Good job! Keep practicing."
+            : "Keep studying and give it another shot."}
         </p>
 
         <div
           className="score-circle"
           style={{
-            "--score": `${percentage}%`,
+            "--progress": `${percentage}%`,
           }}
         >
-          <div className="score-circle-inner">
-            <span>{percentage}%</span>
-          </div>
+          <span>{percentage}%</span>
         </div>
 
         <h3>
@@ -78,7 +83,7 @@ function Quiz({ questions }) {
         </h3>
 
         <p className="score-breakdown">
-          {score} correct out of {questions.length} questions
+          Correct answers
         </p>
 
         <div className="score-actions">
@@ -86,6 +91,7 @@ function Quiz({ questions }) {
             Try Again
           </button>
         </div>
+
       </div>
     );
   }
@@ -96,34 +102,75 @@ function Quiz({ questions }) {
     selectedAnswer !== null &&
     selectedAnswer === question.answer;
 
-  const percentage = Math.round(
-    ((currentQuestion + 1) / questions.length) * 100
-  );
-
   return (
     <div className="quiz-box">
-      <h2>Study Masters Quiz</h2>
 
-      <div className="quiz-progress">
-        <span>
-          Question {currentQuestion + 1} of {questions.length}
-        </span>
+      {/* TOP */}
 
-        <span>{percentage}%</span>
+      <div className="quiz-header">
+
+        <div>
+          <div className="section-label">
+            STUDY MASTERS QUIZ
+          </div>
+
+          <h2>
+            Question {currentQuestion + 1}
+          </h2>
+        </div>
+
+        <div className="question-counter">
+          {currentQuestion + 1}
+          <span> / {questions.length}</span>
+        </div>
+
       </div>
 
-      <h3>{question.question}</h3>
+      {/* PROGRESS */}
+
+      <div className="quiz-progress">
+        <div
+          className="quiz-progress-bar"
+          style={{
+            width: `${
+              ((currentQuestion + 1) /
+                questions.length) *
+              100
+            }%`,
+          }}
+        />
+      </div>
+
+      {/* QUESTION */}
+
+      <div className="question-area">
+
+        <p className="question-number">
+          QUESTION {String(currentQuestion + 1).padStart(2, "0")}
+        </p>
+
+        <h3>
+          {question.question}
+        </h3>
+
+      </div>
+
+      {/* OPTIONS */}
 
       <div className="quiz-options">
+
         {question.options.map((option, index) => {
-          let className = "";
+
+          let className = "quiz-option";
 
           if (selectedAnswer !== null) {
+
             if (index === question.answer) {
-              className = "correct";
+              className += " correct";
             } else if (index === selectedAnswer) {
-              className = "incorrect";
+              className += " incorrect";
             }
+
           }
 
           return (
@@ -133,42 +180,81 @@ function Quiz({ questions }) {
               onClick={() => handleAnswer(index)}
               disabled={selectedAnswer !== null}
             >
-              {option}
+
+              <span className="option-letter">
+                {String.fromCharCode(65 + index)}
+              </span>
+
+              <span className="option-text">
+                {option}
+              </span>
+
+              {selectedAnswer !== null &&
+                index === question.answer && (
+                  <span className="option-result">
+                    ✓
+                  </span>
+                )}
+
+              {selectedAnswer !== null &&
+                index === selectedAnswer &&
+                index !== question.answer && (
+                  <span className="option-result">
+                    ×
+                  </span>
+                )}
+
             </button>
           );
         })}
+
       </div>
 
+      {/* FEEDBACK */}
+
       {selectedAnswer !== null && (
-        <div className="answer-feedback">
-          <h3>
-            {isCorrect ? "Correct! ✅" : "Incorrect ❌"}
-          </h3>
+        <div
+          className={`answer-feedback ${
+            isCorrect ? "feedback-correct" : "feedback-incorrect"
+          }`}
+        >
+
+          <div className="feedback-title">
+            {isCorrect
+              ? "Correct answer"
+              : "Not quite"}
+          </div>
 
           {!isCorrect && (
             <p>
-              <strong>Correct answer:</strong>{" "}
+              <strong>
+                Correct answer:
+              </strong>{" "}
               {question.options[question.answer]}
             </p>
           )}
 
           {question.explanation && (
             <p>
-              <strong>Explanation:</strong>{" "}
               {question.explanation}
             </p>
           )}
+
         </div>
       )}
 
+      {/* NEXT */}
+
       <button
+        className="next-button"
         onClick={handleNext}
         disabled={selectedAnswer === null}
       >
         {currentQuestion === questions.length - 1
-          ? "Finish Quiz"
-          : "Next Question"}
+          ? "Finish Quiz →"
+          : "Next Question →"}
       </button>
+
     </div>
   );
 }
