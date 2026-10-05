@@ -1,66 +1,15 @@
 import { useState } from "react";
 
-function Quiz() {
-  const questions = [
-    {
-      question: "What is IoT in healthcare?",
-      options: [
-        "Internet of Things used to monitor and manage healthcare data",
-        "A hospital billing system",
-        "A type of medical surgery",
-        "A programming language",
-      ],
-      answer: 0,
-    },
-    {
-      question: "Which sensor can measure blood oxygen saturation?",
-      options: [
-        "ECG sensor",
-        "SpO₂ sensor",
-        "Temperature sensor",
-        "Blood pressure sensor",
-      ],
-      answer: 1,
-    },
-    {
-      question: "What does ECG measure?",
-      options: [
-        "Blood glucose",
-        "Body temperature",
-        "Electrical activity of the heart",
-        "Oxygen level",
-      ],
-      answer: 2,
-    },
-    {
-      question: "Which technology allows healthcare devices to communicate wirelessly?",
-      options: [
-        "Bluetooth",
-        "Keyboard",
-        "Monitor",
-        "Printer",
-      ],
-      answer: 0,
-    },
-    {
-      question: "What is a major benefit of remote patient monitoring?",
-      options: [
-        "It eliminates all doctors",
-        "It allows continuous monitoring of patients",
-        "It prevents all diseases",
-        "It replaces hospitals completely",
-      ],
-      answer: 1,
-    },
-  ];
-
+function Quiz({ questions }) {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
 
   function handleAnswer(index) {
-    if (selectedAnswer !== null) return;
+    if (selectedAnswer !== null) {
+      return;
+    }
 
     setSelectedAnswer(index);
 
@@ -70,7 +19,9 @@ function Quiz() {
   }
 
   function handleNext() {
-    if (selectedAnswer === null) return;
+    if (selectedAnswer === null) {
+      return;
+    }
 
     if (currentQuestion === questions.length - 1) {
       setFinished(true);
@@ -88,13 +39,31 @@ function Quiz() {
     setFinished(false);
   }
 
+  if (!questions || questions.length === 0) {
+    return null;
+  }
+
   if (finished) {
+    const percentage = Math.round(
+      (score / questions.length) * 100
+    );
+
     return (
       <div className="quiz-box">
-        <h2>Quiz Complete!</h2>
+        <h2>Quiz Complete 🎉</h2>
+
+        <h3>
+          {score} / {questions.length}
+        </h3>
+
+        <p>{percentage}%</p>
 
         <p>
-          Your score: <strong>{score} / {questions.length}</strong>
+          {percentage >= 80
+            ? "Excellent work!"
+            : percentage >= 60
+            ? "Good job! Keep practicing."
+            : "Keep studying and try again."}
         </p>
 
         <button onClick={restartQuiz}>
@@ -106,6 +75,10 @@ function Quiz() {
 
   const question = questions[currentQuestion];
 
+  const isCorrect =
+    selectedAnswer !== null &&
+    selectedAnswer === question.answer;
+
   return (
     <div className="quiz-box">
       <h2>Study Masters Quiz</h2>
@@ -116,17 +89,54 @@ function Quiz() {
 
       <h3>{question.question}</h3>
 
-      <div>
-        {question.options.map((option, index) => (
-          <button
-            key={index}
-            onClick={() => handleAnswer(index)}
-            disabled={selectedAnswer !== null}
-          >
-            {option}
-          </button>
-        ))}
+      <div className="quiz-options">
+        {question.options.map((option, index) => {
+          let className = "";
+
+          if (selectedAnswer !== null) {
+            if (index === question.answer) {
+              className = "correct";
+            } else if (index === selectedAnswer) {
+              className = "incorrect";
+            }
+          }
+
+          return (
+            <button
+              key={index}
+              className={className}
+              onClick={() => handleAnswer(index)}
+              disabled={selectedAnswer !== null}
+            >
+              {option}
+            </button>
+          );
+        })}
       </div>
+
+      {selectedAnswer !== null && (
+        <div className="answer-feedback">
+          <h3>
+            {isCorrect ? "Correct! ✅" : "Incorrect ❌"}
+          </h3>
+
+          {!isCorrect && (
+            <p>
+              <strong>
+                Correct answer:
+              </strong>{" "}
+              {question.options[question.answer]}
+            </p>
+          )}
+
+          {question.explanation && (
+            <p>
+              <strong>Explanation:</strong>{" "}
+              {question.explanation}
+            </p>
+          )}
+        </div>
+      )}
 
       <button
         onClick={handleNext}

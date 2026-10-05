@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function UploadBox() {
+function UploadBox({ onQuizGenerated }) {
   const [file, setFile] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -54,7 +54,16 @@ function UploadBox() {
         throw new Error(data.error || "Something went wrong.");
       }
 
-      setResult(data.analysis || "No analysis was returned.");
+      // Send the AI-generated quiz to App.jsx
+      if (data.quiz && data.quiz.questions) {
+        onQuizGenerated(data.quiz.questions);
+
+        setResult(
+          `Quiz generated successfully! ${data.quiz.questions.length} questions created.`
+        );
+      } else {
+        throw new Error("No quiz questions were returned.");
+      }
     } catch (error) {
       console.error("Error:", error);
       setError(error.message);
@@ -84,42 +93,21 @@ function UploadBox() {
         </p>
       )}
 
-      {error && (
-        <p>
-          {error}
-        </p>
-      )}
+      {error && <p>{error}</p>}
 
       {loading && (
         <p>
-          Processing PDF and generating study analysis...
+          Processing PDF and generating quiz...
         </p>
       )}
 
-      {result && (
-        <div>
-          <h2>Study Analysis</h2>
-
-          <p>PDF processed successfully!</p>
-
-          <pre
-            style={{
-              whiteSpace: "pre-wrap",
-              textAlign: "left",
-              maxWidth: "800px",
-              margin: "20px auto",
-            }}
-          >
-            {result}
-          </pre>
-        </div>
-      )}
+      {result && <p>{result}</p>}
 
       <button
         onClick={handleGenerateQuiz}
         disabled={!file || loading}
       >
-        {loading ? "Processing..." : "Generate Quiz"}
+        {loading ? "Generating Quiz..." : "Generate Quiz"}
       </button>
     </div>
   );

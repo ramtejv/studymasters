@@ -1,8 +1,15 @@
+import { useState } from "react";
 import Quiz from "./components/Quiz";
 import UploadBox from "./components/UploadBox";
 import "./App.css";
 
 function App() {
+  const [quizQuestions, setQuizQuestions] = useState([]);
+
+  function handleQuizGenerated(questions) {
+    setQuizQuestions(questions);
+  }
+
   return (
     <main className="app">
       <section className="hero">
@@ -14,9 +21,11 @@ function App() {
           Turn your study material into personalized practice.
         </p>
 
-        <UploadBox />
+        <UploadBox onQuizGenerated={handleQuizGenerated} />
 
-        <Quiz />
+        {quizQuestions.length > 0 && (
+          <Quiz questions={quizQuestions} />
+        )}
       </section>
     </main>
   );
