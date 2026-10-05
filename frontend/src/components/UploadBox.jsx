@@ -78,23 +78,51 @@ function UploadBox({ onQuizGenerated }) {
 
   return (
     <div className="upload-box">
-      <h2>Upload your study material</h2>
+      <div className="upload-header">
+        <div className="upload-icon">📄</div>
 
-      <p>
-        Upload a PDF and let Study Masters create a personalized quiz.
-      </p>
+        <h2>Upload your study material</h2>
 
-      <input
-        type="file"
-        accept="application/pdf,.pdf"
-        onChange={handleFileChange}
-        disabled={loading}
-      />
+        <p>
+          Upload a PDF and let Study Masters create a personalized quiz.
+        </p>
+      </div>
+
+      <label className="file-upload">
+        <input
+          type="file"
+          accept="application/pdf,.pdf"
+          onChange={handleFileChange}
+          disabled={loading}
+        />
+
+        <span className="file-upload-icon">↑</span>
+
+        <span className="file-upload-title">
+          {file ? "PDF selected" : "Choose a PDF"}
+        </span>
+
+        <span className="file-upload-subtitle">
+          {file
+            ? "Click to choose a different file"
+            : "Click here or drag and drop your file"}
+        </span>
+      </label>
 
       {file && (
-        <p>
-          Selected file: <strong>{file.name}</strong>
-        </p>
+        <div className="selected-file">
+          <span className="selected-file-icon">📄</span>
+
+          <div className="selected-file-info">
+            <strong>{file.name}</strong>
+
+            <span>
+              {(file.size / (1024 * 1024)).toFixed(2)} MB
+            </span>
+          </div>
+
+          <span className="file-check">✓</span>
+        </div>
       )}
 
       <div className="quiz-settings">
@@ -137,21 +165,47 @@ function UploadBox({ onQuizGenerated }) {
         </div>
       </div>
 
-      {error && <p>{error}</p>}
-
-      {loading && (
-        <p>
-          Processing PDF and generating your {difficulty.toLowerCase()} quiz...
-        </p>
+      {error && (
+        <div className="status-message error-message">
+          <span>⚠️</span>
+          <p>{error}</p>
+        </div>
       )}
 
-      {result && <p>{result}</p>}
+      {loading && (
+        <div className="status-message loading-message">
+          <span className="loading-spinner"></span>
+
+          <p>
+            Processing PDF and generating your{" "}
+            {difficulty.toLowerCase()} quiz...
+          </p>
+        </div>
+      )}
+
+      {result && !loading && (
+        <div className="status-message success-message">
+          <span>✓</span>
+          <p>{result}</p>
+        </div>
+      )}
 
       <button
+        className="generate-button"
         onClick={handleGenerateQuiz}
         disabled={!file || loading}
       >
-        {loading ? "Generating Quiz..." : "Generate Quiz"}
+        {loading ? (
+          <>
+            <span className="button-spinner"></span>
+            Generating Quiz...
+          </>
+        ) : (
+          <>
+            Generate Quiz
+            <span>→</span>
+          </>
+        )}
       </button>
     </div>
   );
