@@ -46,7 +46,7 @@ function UploadBox({ onQuizGenerated }) {
       formData.append("questionCount", questionCount);
       formData.append("difficulty", difficulty);
 
-      const response = await fetch("http://localhost:5000/upload", {
+      const response = await fetch("https://studymasters.onrender.com/upload", {
         method: "POST",
         body: formData,
       });
