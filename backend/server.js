@@ -39,9 +39,27 @@ app.post("/upload", upload.single("pdf"), async (req, res) => {
       });
     }
 
-    console.log(`Received PDF: ${req.file.originalname}`);
+    // 2. Get quiz settings
+    const questionCount = Number(req.body.questionCount) || 5;
+    const difficulty = req.body.difficulty || "Medium";
 
-    // 2. Extract text from PDF
+    if (![5, 10, 15].includes(questionCount)) {
+      return res.status(400).json({
+        error: "Question count must be 5, 10, or 15.",
+      });
+    }
+
+    if (!["Easy", "Medium", "Hard"].includes(difficulty)) {
+      return res.status(400).json({
+        error: "Difficulty must be Easy, Medium, or Hard.",
+      });
+    }
+
+    console.log(`Received PDF: ${req.file.originalname}`);
+    console.log(`Question count: ${questionCount}`);
+    console.log(`Difficulty: ${difficulty}`);
+
+    // 3. Extract PDF text
     const parser = new PDFParse({
       data: req.file.buffer,
       CanvasFactory,
@@ -61,7 +79,7 @@ app.post("/upload", upload.single("pdf"), async (req, res) => {
       });
     }
 
-    // 3. Ask Gemini to create quiz
+    // 4. Ask Gemini to create quiz
     let response = null;
 
     for (let attempt = 1; attempt <= 3; attempt++) {
@@ -76,7 +94,26 @@ app.post("/upload", upload.single("pdf"), async (req, res) => {
           contents: `
 You are Study Masters, an educational quiz generator.
 
-Read the study material below and create exactly 5 multiple-choice questions.
+Read the study material below and create exactly ${questionCount} multiple-choice questions.
+
+Difficulty level: ${difficulty}
+
+Difficulty rules:
+
+Easy:
+- Test basic facts and definitions.
+- Keep questions straightforward.
+- Avoid tricky wording.
+
+Medium:
+- Test understanding and application.
+- Require some reasoning.
+- Include plausible incorrect options.
+
+Hard:
+- Test deeper understanding.
+- Use application, comparison, and reasoning.
+- Make incorrect options challenging but still clearly wrong based on the material.
 
 Return ONLY valid JSON.
 
@@ -104,7 +141,7 @@ Use exactly this format:
 
 Rules:
 
-- Create exactly 5 questions.
+- Create exactly ${questionCount} questions.
 - Every question must have exactly 4 options.
 - "answer" must be 0, 1, 2, or 3.
 - 0 means the first option is correct.
@@ -145,14 +182,13 @@ ${extractedText}
       }
     }
 
-    // 4. Get Gemini response
+    // 5. Get Gemini response
     let aiText = "";
 
     if (response && response.text) {
       aiText = response.text;
     }
 
-    // Backup method
     if (!aiText && response?.candidates?.[0]?.content?.parts) {
       aiText = response.candidates[0].content.parts
         .filter((part) => part.text)
@@ -163,8 +199,6 @@ ${extractedText}
     console.log(`AI response length: ${aiText.length}`);
 
     if (!aiText) {
-      console.log("Gemini returned no usable text.");
-
       return res.status(500).json({
         error: "Gemini returned an empty response.",
       });
@@ -173,13 +207,13 @@ ${extractedText}
     console.log("Raw Gemini response:");
     console.log(aiText);
 
-    // 5. Remove accidental markdown
+    // 6. Remove accidental markdown
     aiText = aiText
       .replace(/```json/g, "")
       .replace(/```/g, "")
       .trim();
 
-    // 6. Convert Gemini response into JavaScript object
+    // 7. Convert Gemini response into JavaScript object
     let quiz;
 
     try {
@@ -193,26 +227,74 @@ ${extractedText}
       });
     }
 
-    // 7. Validate quiz
+    // 8. Validate quiz structure
     if (!quiz.questions || !Array.isArray(quiz.questions)) {
       return res.status(500).json({
         error: "Gemini did not return valid questions.",
       });
     }
 
+    if (quiz.questions.length !== questionCount) {
+      return res.status(500).json({
+        error: `Gemini generated ${quiz.questions.length} questions instead of ${questionCount}.`,
+      });
+    }
+
+    for (let i = 0; i < quiz.questions.length; i++) {
+      const question = quiz.questions[i];
+
+      if (
+        !question.question ||
+        typeof question.question !== "string"
+      ) {
+        return res.status(500).json({
+          error: `Question ${i + 1} is missing question text.`,
+        });
+      }
+
+      if (
+        !Array.isArray(question.options) ||
+        question.options.length !== 4
+      ) {
+        return res.status(500).json({
+          error: `Question ${i + 1} must have exactly 4 options.`,
+        });
+      }
+
+      if (
+        typeof question.answer !== "number" ||
+        question.answer < 0 ||
+        question.answer > 3
+      ) {
+        return res.status(500).json({
+          error: `Question ${i + 1} has an invalid answer.`,
+        });
+      }
+
+      if (
+        !question.explanation ||
+        typeof question.explanation !== "string"
+      ) {
+        return res.status(500).json({
+          error: `Question ${i + 1} is missing an explanation.`,
+        });
+      }
+    }
+
     console.log(
-      `Generated ${quiz.questions.length} questions.`
+      `Generated ${quiz.questions.length} valid ${difficulty.toLowerCase()} questions.`
     );
 
-    // 8. Send quiz to frontend
+    // 9. Send quiz to frontend
     res.json({
       success: true,
       message: "Quiz generated successfully!",
       filename: req.file.originalname,
       extractedCharacters: extractedText.length,
+      questionCount: questionCount,
+      difficulty: difficulty,
       quiz: quiz,
     });
-
   } catch (error) {
     console.error("Error:", error);
 
