@@ -6,6 +6,9 @@ function UploadBox({ onQuizGenerated }) {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
 
+  const [questionCount, setQuestionCount] = useState(5);
+  const [difficulty, setDifficulty] = useState("Medium");
+
   function handleFileChange(event) {
     const selectedFile = event.target.files[0];
 
@@ -40,6 +43,8 @@ function UploadBox({ onQuizGenerated }) {
       const formData = new FormData();
 
       formData.append("pdf", file);
+      formData.append("questionCount", questionCount);
+      formData.append("difficulty", difficulty);
 
       const response = await fetch("http://localhost:5000/upload", {
         method: "POST",
@@ -54,7 +59,6 @@ function UploadBox({ onQuizGenerated }) {
         throw new Error(data.error || "Something went wrong.");
       }
 
-      // Send the AI-generated quiz to App.jsx
       if (data.quiz && data.quiz.questions) {
         onQuizGenerated(data.quiz.questions);
 
@@ -77,7 +81,7 @@ function UploadBox({ onQuizGenerated }) {
       <h2>Upload your study material</h2>
 
       <p>
-        Upload a PDF and let Study Masters create questions from it.
+        Upload a PDF and let Study Masters create a personalized quiz.
       </p>
 
       <input
@@ -93,11 +97,51 @@ function UploadBox({ onQuizGenerated }) {
         </p>
       )}
 
+      <div className="quiz-settings">
+        <div className="setting">
+          <label htmlFor="question-count">
+            Number of questions
+          </label>
+
+          <select
+            id="question-count"
+            value={questionCount}
+            onChange={(event) =>
+              setQuestionCount(Number(event.target.value))
+            }
+            disabled={loading}
+          >
+            <option value={5}>5 Questions</option>
+            <option value={10}>10 Questions</option>
+            <option value={15}>15 Questions</option>
+          </select>
+        </div>
+
+        <div className="setting">
+          <label htmlFor="difficulty">
+            Difficulty
+          </label>
+
+          <select
+            id="difficulty"
+            value={difficulty}
+            onChange={(event) =>
+              setDifficulty(event.target.value)
+            }
+            disabled={loading}
+          >
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
+          </select>
+        </div>
+      </div>
+
       {error && <p>{error}</p>}
 
       {loading && (
         <p>
-          Processing PDF and generating quiz...
+          Processing PDF and generating your {difficulty.toLowerCase()} quiz...
         </p>
       )}
 

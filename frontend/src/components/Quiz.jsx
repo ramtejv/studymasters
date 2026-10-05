@@ -49,26 +49,43 @@ function Quiz({ questions }) {
     );
 
     return (
-      <div className="quiz-box">
-        <h2>Quiz Complete 🎉</h2>
+      <div className="quiz-box score-screen">
+        <div className="score-icon">📚</div>
+
+        <h2>Quiz Complete!</h2>
+
+        <p className="score-message">
+          {percentage >= 80
+            ? "Excellent work! 🎉"
+            : percentage >= 60
+            ? "Good job! Keep practicing. 💪"
+            : "Keep studying and give it another shot. 💪"}
+        </p>
+
+        <div
+          className="score-circle"
+          style={{
+            "--score": `${percentage}%`,
+          }}
+        >
+          <div className="score-circle-inner">
+            <span>{percentage}%</span>
+          </div>
+        </div>
 
         <h3>
           {score} / {questions.length}
         </h3>
 
-        <p>{percentage}%</p>
-
-        <p>
-          {percentage >= 80
-            ? "Excellent work!"
-            : percentage >= 60
-            ? "Good job! Keep practicing."
-            : "Keep studying and try again."}
+        <p className="score-breakdown">
+          {score} correct out of {questions.length} questions
         </p>
 
-        <button onClick={restartQuiz}>
-          Try Again
-        </button>
+        <div className="score-actions">
+          <button onClick={restartQuiz}>
+            Try Again
+          </button>
+        </div>
       </div>
     );
   }
@@ -79,13 +96,21 @@ function Quiz({ questions }) {
     selectedAnswer !== null &&
     selectedAnswer === question.answer;
 
+  const percentage = Math.round(
+    ((currentQuestion + 1) / questions.length) * 100
+  );
+
   return (
     <div className="quiz-box">
       <h2>Study Masters Quiz</h2>
 
-      <p>
-        Question {currentQuestion + 1} of {questions.length}
-      </p>
+      <div className="quiz-progress">
+        <span>
+          Question {currentQuestion + 1} of {questions.length}
+        </span>
+
+        <span>{percentage}%</span>
+      </div>
 
       <h3>{question.question}</h3>
 
@@ -122,9 +147,7 @@ function Quiz({ questions }) {
 
           {!isCorrect && (
             <p>
-              <strong>
-                Correct answer:
-              </strong>{" "}
+              <strong>Correct answer:</strong>{" "}
               {question.options[question.answer]}
             </p>
           )}

@@ -10,13 +10,18 @@ body {
 }
 
 button,
-input {
+input,
+select {
   font-family: inherit;
 }
 
 button {
   transition: 0.2s ease;
 }
+
+/* =========================
+   APP
+========================= */
 
 .app {
   min-height: 100vh;
@@ -99,6 +104,45 @@ button {
 }
 
 /* =========================
+   QUIZ SETTINGS
+========================= */
+
+.quiz-settings {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin: 25px 0;
+}
+
+.setting {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+.setting label {
+  font-size: 14px;
+  color: #aeb4c0;
+}
+
+.setting select {
+  min-width: 160px;
+  padding: 11px 14px;
+  border: 1px solid #343a48;
+  border-radius: 9px;
+  background: #1e222c;
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.setting select:focus {
+  outline: none;
+  border-color: #ffffff;
+}
+
+/* =========================
    QUIZ
 ========================= */
 
@@ -118,19 +162,33 @@ button {
   font-size: 28px;
 }
 
-.quiz-box > p:first-of-type {
-  text-align: center;
-  color: #8f97a6;
-  font-size: 14px;
-}
-
 .quiz-box h3 {
   font-size: 21px;
   line-height: 1.5;
   margin: 30px 0 22px;
 }
 
-/* Answer buttons */
+/* =========================
+   QUIZ PROGRESS
+========================= */
+
+.quiz-progress {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  color: #8f97a6;
+  font-size: 14px;
+}
+
+.quiz-progress span:last-child {
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* =========================
+   QUIZ OPTIONS
+========================= */
 
 .quiz-options {
   display: flex;
@@ -159,19 +217,23 @@ button {
   cursor: default;
 }
 
-/* Correct / incorrect answers */
+/* Correct answer */
 
 .quiz-options button.correct {
   border-color: #3ddc97;
   background: #17352b;
 }
 
+/* Incorrect answer */
+
 .quiz-options button.incorrect {
   border-color: #ff6262;
   background: #3a1d22;
 }
 
-/* Feedback */
+/* =========================
+   ANSWER FEEDBACK
+========================= */
 
 .answer-feedback {
   margin-top: 20px;
@@ -190,7 +252,9 @@ button {
   line-height: 1.5;
 }
 
-/* Next / finish button */
+/* =========================
+   NEXT / FINISH BUTTON
+========================= */
 
 .quiz-box > button {
   width: 100%;
@@ -214,10 +278,94 @@ button {
   cursor: not-allowed;
 }
 
-/* Score screen */
+/* =========================
+   SCORE SCREEN
+========================= */
 
-.quiz-box strong {
-  font-size: 22px;
+.score-screen {
+  text-align: center;
+}
+
+.score-icon {
+  font-size: 52px;
+  margin-bottom: 10px;
+}
+
+.score-screen h2 {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+.score-message {
+  color: #aeb4c0;
+  margin-bottom: 25px;
+}
+
+/* =========================
+   SCORE PROGRESS CIRCLE
+========================= */
+
+.score-circle {
+  width: 150px;
+  height: 150px;
+  margin: 25px auto;
+  border-radius: 50%;
+
+  background: conic-gradient(
+    #3ddc97 var(--score),
+    #ffffff var(--score)
+  );
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.score-circle-inner {
+  width: 134px;
+  height: 134px;
+  border-radius: 50%;
+  background: #0f1117;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.score-circle span {
+  font-size: 36px;
+  font-weight: bold;
+}
+
+/* =========================
+   SCORE DETAILS
+========================= */
+
+.score-screen h3 {
+  font-size: 28px;
+  margin: 10px 0;
+}
+
+.score-breakdown {
+  color: #8f97a6;
+  margin-bottom: 25px;
+}
+
+.score-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.score-actions button {
+  width: auto;
+  min-width: 130px;
+  margin: 0;
+}
+
+.score-actions .secondary-button {
+  background: #292e3a;
+  color: #ffffff;
 }
 
 /* =========================
@@ -244,5 +392,21 @@ button {
 
   .quiz-box h3 {
     font-size: 18px;
+  }
+
+  .quiz-settings {
+    flex-direction: column;
+  }
+
+  .setting select {
+    width: 100%;
+  }
+
+  .score-actions {
+    flex-direction: column;
+  }
+
+  .score-actions button {
+    width: 100%;
   }
 }
